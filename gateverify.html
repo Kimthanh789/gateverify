@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>GateVerify AI Pro</title>
+
+<style>
+body{
+    background:#020617;
+    font-family:Segoe UI;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    color:#fff;
+}
+
+.app{
+    width:380px;
+    background:#0f172a;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 0 40px rgba(0,0,0,0.7);
+}
+
+.header{
+    text-align:center;
+    margin-bottom:15px;
+}
+
+.header h1{
+    font-size:18px;
+    margin:0;
+}
+
+.header p{
+    font-size:11px;
+    color:#94a3b8;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:none;
+    margin-top:10px;
+    font-size:14px;
+}
+
+select{
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+button{
+    width:100%;
+    margin-top:15px;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(90deg,#3b82f6,#06b6d4);
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.progress{
+    height:8px;
+    background:#1e293b;
+    border-radius:10px;
+    margin-top:15px;
+    overflow:hidden;
+}
+
+.bar{
+    height:100%;
+    width:0%;
+    background:#22c55e;
+    transition:width 0.3s;
+}
+
+.loading-text{
+    font-size:12px;
+    margin-top:10px;
+    color:#94a3b8;
+}
+
+.result{
+    margin-top:20px;
+    font-size:13px;
+    line-height:1.6;
+}
+
+.hidden{display:none;}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+    <div class="header">
+        <h1>GateVerify AI</h1>
+        <p>Hệ thống kiểm tra danh tính cổng quốc tế</p>
+    </div>
+
+    <input id="gate" placeholder="Nhập tên cổng...">
+
+    <!-- CHỌN KẾT QUẢ -->
+    <select id="mode">
+        <option value="auto">Tự động</option>
+        <option value="safe">Uy tín</option>
+        <option value="warning">Nghi ngờ</option>
+        <option value="danger">Rủi ro cao</option>
+    </select>
+
+    <button onclick="startScan()">KHỞI CHẠY QUÉT AI</button>
+
+    <div class="progress">
+        <div class="bar" id="bar"></div>
+    </div>
+
+    <div class="loading-text" id="loadingText"></div>
+
+    <div class="result hidden" id="result"></div>
+</div>
+
+<script>
+
+let steps = [
+"Khởi tạo AI...",
+"Kết nối dữ liệu toàn cầu...",
+"Quét danh tính cổng...",
+"Phân tích lịch sử hoạt động...",
+"Đánh giá mức độ rủi ro...",
+"Tổng hợp báo cáo..."
+];
+
+function startScan(){
+    let bar = document.getElementById("bar");
+    let text = document.getElementById("loadingText");
+    let result = document.getElementById("result");
+
+    bar.style.width="0%";
+    result.classList.add("hidden");
+
+    let progress = 0;
+    let i = 0;
+
+    let interval = setInterval(()=>{
+        progress += Math.random()*20;
+        if(progress>100) progress=100;
+
+        bar.style.width = progress + "%";
+        text.innerHTML = steps[i];
+
+        i++;
+        if(i>=steps.length) i=steps.length-1;
+
+        if(progress>=100){
+            clearInterval(interval);
+            showResult();
+        }
+    },500);
+}
+
+function showResult(){
+    let mode = document.getElementById("mode").value;
+    let result = document.getElementById("result");
+
+    if(mode==="auto"){
+        let r = Math.random();
+        if(r<0.4) mode="danger";
+        else if(r<0.7) mode="warning";
+        else mode="safe";
+    }
+
+    result.classList.remove("hidden");
+
+    if(mode==="safe"){
+        result.innerHTML=`
+        <b style="color:#22c55e">✅ CỔNG UY TÍN</b><br>
+        • Thời gian hoạt động: 5+ năm<br>
+        • Máy chủ: Quốc tế<br>
+        • Rủi ro: Thấp<br>
+        • Đánh giá: 9.2 / 10
+        `;
+    }
+
+    if(mode==="warning"){
+        result.innerHTML=`
+        <b style="color:#facc15">⚠️ CÓ DẤU HIỆU BẤT THƯỜNG</b><br>
+        • Rủi ro: Trung bình<br>
+        • Cảnh báo: Giao dịch không ổn định
+        `;
+    }
+
+    if(mode==="danger"){
+        result.innerHTML=`
+        <b style="color:#ef4444">❌ CỔNG RỦI RO CAO</b><br>
+        • Rủi ro: Cao<br>
+        • Phát hiện dấu hiệu bất thường
+        `;
+    }
+}
+</script>
+
+</body>
+</html>
