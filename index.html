@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GateVerify AI</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:Segoe UI;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    color:#fff;
+    overflow:hidden;
+}
+
+/* GIF nền hacker */
+.bg{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:url("https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExYWFydXJqODdlZWlvbDVsYjFyZGd0MDBqMWt6d2F3NTVpNnp4MXdqOSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/I0e4u216Qhww8eRTVq/giphy.gif") center/cover;
+    z-index:-1;
+}
+
+/* layout */
+.container{
+    display:flex;
+    gap:20px;
+}
+
+/* app */
+.phone{
+    width:360px;
+    border-radius:25px;
+    background:rgba(0,0,0,0.8);
+    backdrop-filter:blur(10px);
+    padding:12px;
+}
+
+.app{
+    padding:15px;
+}
+
+.title{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.title h1{
+    font-size:18px;
+    margin:0;
+    color:#38bdf8;
+}
+
+.title p{
+    font-size:12px;
+    color:#94a3b8;
+}
+
+/* input + button fix lệch */
+input, button{
+    width:100%;
+    display:block;
+}
+
+input{
+    padding:12px;
+    border-radius:10px;
+    border:none;
+    margin-top:10px;
+    font-size:14px;
+}
+
+button{
+    margin-top:10px;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(90deg,#06b6d4,#3b82f6);
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+/* progress */
+.progress{
+    height:6px;
+    background:#1e293b;
+    border-radius:10px;
+    margin-top:10px;
+    overflow:hidden;
+}
+
+.bar{
+    height:100%;
+    width:0%;
+    background:#22c55e;
+}
+
+/* loading */
+.loading{
+    font-size:11px;
+    margin-top:6px;
+    color:#94a3b8;
+}
+
+/* result */
+.result{
+    margin-top:12px;
+    font-size:13px;
+}
+
+.card{
+    background:rgba(2,6,23,0.9);
+    padding:12px;
+    border-radius:12px;
+    border:1px solid rgba(56,189,248,0.3);
+}
+
+/* tiêu đề kết quả */
+.result-title{
+    color:#22c55e;
+    font-weight:bold;
+    font-size:14px;
+    margin-bottom:8px;
+}
+
+/* panel DB */
+.panel{
+    width:260px;
+    background:rgba(0,0,0,0.8);
+    backdrop-filter:blur(10px);
+    padding:10px;
+    border-radius:15px;
+}
+
+textarea{
+    width:100%;
+    height:200px;
+    border-radius:10px;
+    border:none;
+    padding:10px;
+    margin-top:8px;
+}
+
+.hidden{display:none;}
+</style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+
+<div class="container">
+
+<!-- APP -->
+<div class="phone">
+    <div class="app">
+
+        <div class="title">
+            <h1>GateVerify AI</h1>
+            <p>Hệ thống kiểm tra danh tính Cổng Quốc Tế</p>
+        </div>
+
+        <input id="gate" placeholder="Nhập tên cổng cần kiểm tra...">
+        <button onclick="scan()">KHỞI CHẠY QUÉT AI</button>
+
+        <div class="progress"><div class="bar" id="bar"></div></div>
+        <div class="loading" id="loading"></div>
+
+        <div class="result hidden" id="result"></div>
+
+    </div>
+</div>
+
+<!-- PANEL DB -->
+<div class="panel">
+    <b>DATABASE</b>
+    <textarea id="dbInput" placeholder="sc88|5 năm|Singapore|Thấp|9.2|Ổn định|92%"></textarea>
+    <button onclick="loadDB()">NẠP DATA</button>
+</div>
+
+</div>
+
+<script>
+
+let db=[];
+
+// load DB
+function loadDB(){
+    let raw=document.getElementById("dbInput").value.trim();
+    db=[];
+
+    raw.split("\n").forEach(line=>{
+        let p=line.split("|");
+        if(p.length>=7){
+            db.push({
+                name:p[0].toLowerCase(),
+                time:p[1],
+                location:p[2],
+                risk:p[3],
+                score:p[4],
+                status:p[5],
+                winrate:p[6]
+            });
+        }
+    });
+
+    alert("Đã nạp "+db.length+" cổng");
+}
+
+// search
+function findGate(name){
+    name=name.toLowerCase();
+    return db.find(g=>name.includes(g.name));
+}
+
+// scan
+function scan(){
+    let bar=document.getElementById("bar");
+    let loading=document.getElementById("loading");
+    let result=document.getElementById("result");
+
+    result.classList.add("hidden");
+    bar.style.width="0%";
+
+    let steps=[
+    "Khởi tạo AI...",
+    "Kết nối dữ liệu toàn cầu...",
+    "Quét danh tính...",
+    "Phân tích lịch sử...",
+    "Đánh giá rủi ro...",
+    "Tổng hợp kết quả..."
+    ];
+
+    let i=0,progress=0;
+
+    let interval=setInterval(()=>{
+        progress+=Math.random()*25;
+        if(progress>100) progress=100;
+
+        bar.style.width=progress+"%";
+        loading.innerText=steps[i];
+
+        i++;
+        if(i>=steps.length) i=steps.length-1;
+
+        if(progress>=100){
+            clearInterval(interval);
+            showResult();
+        }
+    },400);
+}
+
+// show result
+function showResult(){
+    let name=document.getElementById("gate").value;
+    let result=document.getElementById("result");
+
+    let data=findGate(name);
+
+    if(!data){
+        result.innerHTML=`<div class="card">⚠️ Không có dữ liệu</div>`;
+    }else{
+        result.innerHTML=`
+        <div class="card">
+        <div class="result-title">🧠 KẾT QUẢ PHÂN TÍCH</div>
+
+        📅 Thời gian: ${data.time}<br>
+        🌍 Trụ sở: ${data.location}<br>
+        ⚠️ Rủi ro: ${data.risk}<br>
+        📊 Chấm điểm: ${data.score}/10<br>
+        🔎 Tình trạng: ${data.status}<br>
+        💰 Tỉ lệ thắng: ${data.winrate}
+        </div>`;
+    }
+
+    result.classList.remove("hidden");
+}
+
+</script>
+
+</body>
+</html>
